@@ -1,6 +1,7 @@
 import csv
 import math
-
+from datetime import date
+import calendar
 totalprice1 = 0
 totalprice2 = 0
 totalprice3 = 0
@@ -20,19 +21,20 @@ with open('orders_sample.csv', mode='r', newline='', encoding='utf-8') as file:
             try:
                 quantity = float(row[3])
                 price = float(row[4])
-                
-                if quantity > 5:
-                    discounted_quantity = quantity - 5
-                    row_total = (5 * price) + (discounted_quantity * price * 0.90)
+                # Check if quantity is strictly greater than 5 first
+                if quantity >= 5:
+                   discounted_quantity = quantity
+                   row_total = discounted_quantity * price * 0.90  # Applies the 10% discount
                 elif quantity <0:
                     print(f"invalid quantity in row: {row}")
                     continue
-                else:
-                    row_total = quantity * price
-                
+                elif quantity < 5:
+                     discounted_quantity = quantity
+                     row_total = discounted_quantity * price
                 
                 if product_id == "E101":
-                    totalprice1 += row_total
+                
+                     totalprice1 += row_total
                 elif product_id == "E102":
                     totalprice2 += row_total
                 elif product_id == "E103":
@@ -43,10 +45,9 @@ with open('orders_sample.csv', mode='r', newline='', encoding='utf-8') as file:
                 print(f"invalid numeric data in row: {row}")
         else:
             print(f"row with unrecognized product ID: {row}")
-
-totalprice1 = round(max(0, totalprice1 - subsidy), 0)
-totalprice2 = round(max(0, totalprice2 - subsidy), 0)
-totalprice3 = round(max(0, totalprice3 - subsidy), 0)
+totalprice1= round(max(0, totalprice1-subsidy)*(0.90), 0)
+totalprice2 = round(max(0, totalprice2-subsidy)*(0.90), 0)
+totalprice3 = round(max(0, totalprice3-subsidy )*(0.90 if quantity > 5 else 1.0), 0)
 total=totalprice1 + totalprice2 + totalprice3
 
 # Print final results
