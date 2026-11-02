@@ -85,9 +85,9 @@ for item_row in valid_rows:
         employee_final_totals[emp] += final_bill
         processed_days.add(unique_day_key)
 
-totalprice1 = employee_final_totals["E101"]
-totalprice2 = employee_final_totals["E102"]
-totalprice3 = employee_final_totals["E103"]
+totalprice1 = round(employee_final_totals["E101"], 0)
+totalprice2 = round(employee_final_totals["E102"], 0)
+totalprice3 = round(employee_final_totals["E103"], 0)
 total = totalprice1 + totalprice2 + totalprice3
 
 print(f" E101: {totalprice1:.2f}")
