@@ -3,11 +3,12 @@ import sys
 from collections import defaultdict
 from datetime import datetime
 
-EXPECTED_HEADER = ["date","employee_id","item", "quantity", "price"]
+EXPECTED_HEADER = ["date","employee_ids","item", "quantity", "price"]
 
 totalprice1 = 0
 totalprice2 = 0
 totalprice3 = 0
+totalprice4 = 0
 subsidy = 60
 valid_rows = []
 daily_totals = defaultdict(float)
@@ -17,14 +18,12 @@ try:
     with open('orders_sample.csv', mode='r', newline='', encoding='utf-8') as file:
         reader = csv.reader(file)
         
-        # Read the first row as the header
         header = next(reader, None)
         
         if header is None:
             print("Error: The CSV file is completely empty.")
             sys.exit(1)
             
-        # Clean and normalize actual headers (lowercase and stripped of spaces)
         actual_header = [col.strip().lower() for col in header]
         expected_header_lower = [col.lower() for col in EXPECTED_HEADER]
         
@@ -42,7 +41,7 @@ try:
             
             date_str = row[0].strip()
             product_id = row[1].strip()
-            employee_id = row[2].strip()
+            employee_ids = row[2].strip()
             
             try:
                 datetime.strptime(date_str, "%Y-%m-%d").date()
@@ -50,7 +49,8 @@ try:
                 print(f"invalid date error: {date_str} in row data")
                 continue
                 
-            if product_id in ["E101", "E102", "E103"]:
+            if product_id and str(product_id).strip(): 
+
                 try:
                     quantity = float(row[3].strip())
                     price = float(row[4].strip())
@@ -66,7 +66,7 @@ try:
                     valid_rows.append({
                         'date': date_str,
                         'product_id': product_id,
-                        'employee_id': employee_id,
+                        'employee_ids': employee_ids,
                         'quantity': quantity,
                         'price': price,
                         'row_total': row_total
@@ -112,7 +112,7 @@ for item_row in valid_rows:
 totalprice1 = round(employee_final_totals["E101"], 0)
 totalprice2 = round(employee_final_totals["E102"], 0)
 totalprice3 = round(employee_final_totals["E103"], 0)
-total = totalprice1 + totalprice2 + totalprice3
+total = totalprice1 + totalprice2 + totalprice3 + totalprice4
 
 print(f" E101: {totalprice1:.2f}")
 print(f" E102 : {totalprice2:.2f}")
