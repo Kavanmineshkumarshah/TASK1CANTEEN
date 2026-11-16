@@ -42,7 +42,7 @@ try:
             try:
                 datetime.strptime(date_str, "%Y-%m-%d").date()
             except ValueError:
-                print(f"invalid date error: {date_str} in row data")
+                print(f"line14:invalid date ")
                 continue
                 
             if product_id and str(product_id).strip():
@@ -51,7 +51,7 @@ try:
                     price = float(row[4].strip())
                     
                     if quantity < 0:
-                        print(f"invalid quantity in row: {row}")
+                        print(f"line15:invalid quantity ")
                         continue
                     elif quantity >= 5:
                         row_total = quantity * price * 0.90
@@ -71,9 +71,9 @@ try:
                     daily_totals[group_key] += row_total
                     
                 except ValueError:
-                    print(f"invalid numeric data in row: {row}")
+                    print(f"line17:invalid price")
             else:
-                print(f"row with unrecognized product ID: {row}")
+                print(f"line16:missing employee")
 
 except FileNotFoundError:
     print("Error: 'orders_sample.csv' file not found.")
@@ -110,7 +110,7 @@ totalprice2 = round(employee_final_totals["E102"], 0)
 totalprice3 = round(employee_final_totals["E103"], 0)
 total = totalprice1 + totalprice2 + totalprice3
 
-print(f" E101: {totalprice1:.2f}")
-print(f" E102: {totalprice2:.2f}")
-print(f" E103: {totalprice3:.2f}")
-print(f"Total: {total:.2f}")
+print(f" E101: {totalprice1:.0f}")
+print(f" E102: {totalprice2:.0f}")
+print(f" E103: {totalprice3:.0f}")
+print(f"Total: {total:.0f}")
