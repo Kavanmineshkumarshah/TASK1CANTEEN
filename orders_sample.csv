@@ -1,7 +1,7 @@
-date,employee_ids,item,quantity,price
+date,employee_id,item,quantity,price
 2026-09-01,E101,Thali,1,80
 2026-09-01,E101,Tea,2,10
-2026-09-02,E101,Tea,1,10
+2026-09-02,E101,Tea,1,1
 2026-09-02,E101,Samosa,2,15
 2026-09-05,E101,Thali,1,80
 2026-09-01,E102,Tea,1,10
