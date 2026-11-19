@@ -3,6 +3,14 @@ import csv
 from datetime import datetime
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 import sys
+import sys
+import os
+
+# Add the parent directory to sys.path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import canteen
+
 
 EXPECTED_HEADER = ["date", "employee_id", "item", "quantity", "price"]
 SUBSIDY = Decimal("60")
