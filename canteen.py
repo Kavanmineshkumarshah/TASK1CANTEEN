@@ -1,11 +1,12 @@
 from collections import defaultdict
 import csv
 from datetime import datetime
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 import sys
 
 EXPECTED_HEADER = ["date", "employee_id", "item", "quantity", "price"]
-SUBSIDY = 60
-MONTHLY_MAX = 2500
+SUBSIDY = Decimal("60")
+MONTHLY_MAX = Decimal("2500")
 
 
 def parse_cli_args():
@@ -41,28 +42,21 @@ def is_valid_date(date_str):
         return False
 
 
-def parse_positive_int(qty_str):
-    """Parse quantity as a non-negative integer, or return None if invalid."""
+def parse_positive_decimal(val_str):
+    """Parse a string as a non-negative finite Decimal, or return None if invalid."""
     try:
-        quantity = int(qty_str)
-        return quantity if quantity >= 0 else None
-    except ValueError:
-        return None
-
-
-def parse_positive_float(price_str):
-    """Parse price as a non-negative float, or return None if invalid."""
-    try:
-        price = float(price_str)
-        return price if price >= 0 else None
-    except ValueError:
+        value = Decimal(val_str)
+        if not value.is_finite() or value < Decimal("0"):
+            return None
+        return value
+    except InvalidOperation:
         return None
 
 
 def calculate_row_total(quantity, price):
     """Calculate item total with a 10% bulk discount for quantities of 5 or more."""
-    if quantity >= 5:
-        return quantity * price * 0.90
+    if quantity >= Decimal("5"):
+        return quantity * price * Decimal("0.90")
     return quantity * price
 
 
@@ -94,12 +88,12 @@ def validate_and_parse_row(line_num, row):
         print(f"line{line_num}:missing item")
         return None
 
-    quantity = parse_positive_int(qty_str)
+    quantity = parse_positive_decimal(qty_str)
     if quantity is None:
         print(f"line{line_num}:invalid quantity")
         return None
 
-    price = parse_positive_float(price_str)
+    price = parse_positive_decimal(price_str)
     if price is None:
         print(f"line{line_num}:invalid price")
         return None
@@ -118,7 +112,7 @@ def read_and_process_csv(file_name):
     """Read the CSV file, validate rows, and group valid totals by date and employee."""
     valid_rows = []
     rejected_rows = []
-    daily_totals = defaultdict(float)
+    daily_totals = defaultdict(Decimal)
 
     try:
         with open(file_name, mode="r", newline="", encoding="utf-8") as file:
@@ -144,7 +138,7 @@ def read_and_process_csv(file_name):
 
 def calculate_employee_totals(valid_rows, daily_totals):
     """Apply weekday subsidies and the ₹2,500 monthly cap per employee."""
-    employee_final_totals = defaultdict(float)
+    employee_final_totals = defaultdict(Decimal)
     processed_days = set()
 
     for item_row in valid_rows:
@@ -162,7 +156,7 @@ def calculate_employee_totals(valid_rows, daily_totals):
         if not is_subsidy_applicable:
             final_bill = gross_total
         else:
-            final_bill = max(0.0, gross_total - SUBSIDY)
+            final_bill = max(Decimal("0"), gross_total - SUBSIDY)
 
         employee_final_totals[emp] += final_bill
         processed_days.add(unique_day_key)
@@ -176,15 +170,16 @@ def calculate_employee_totals(valid_rows, daily_totals):
 
 def print_summary(employee_final_totals, rejected_count):
     """Print the final rounded totals for E101, E102, E103, overall total, and rejected count."""
-    totalprice1 = round(employee_final_totals["E101"], 0)
-    totalprice2 = round(employee_final_totals["E102"], 0)
-    totalprice3 = round(employee_final_totals["E103"], 0)
-    total = totalprice1 + totalprice2 + totalprice3
+    employees = ["E101", "E102", "E103"]
+    bills = {
+        emp: employee_final_totals[emp].quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+        for emp in employees
+    }
+    total = sum(bills.values(), Decimal("0"))
 
-    print(f"E101: {totalprice1:.0f}")
-    print(f"E102: {totalprice2:.0f}")
-    print(f"E103: {totalprice3:.0f}")
-    print(f"Total: {total:.0f}")
+    for emp in employees:
+        print(f"{emp}: {bills[emp]}")
+    print(f"Total: {total}")
     print(f"Rejected: {rejected_count}")
 
 
