@@ -10,7 +10,6 @@ from unittest.mock import patch
 
 # Change 'canteen' below if your main script has a different filename
 import sys
-import os
 
 # Add the parent directory to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -133,7 +132,7 @@ class TestCanteenBilling(unittest.TestCase):
                 "Rejected: 1"
             ])
         finally:
-            os.remove(temp_path)
+            os.remove(temp_path)       
 
 
 if __name__ == "__main__":
